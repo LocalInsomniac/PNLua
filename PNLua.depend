@@ -1,0 +1,584 @@
+# depslib dependency file v1.0
+1631223269 source:c:\users\arman\documents\github\pnlua\pnlua.cpp
+	"pnlua.h"
+
+1631216993 source:c:\users\arman\documents\github\pnlua\dllmain.cpp
+	<Windows.h>
+
+1615818769 source:c:\users\arman\documents\github\pnlua\lua\lapi.c
+	"lprefix.h"
+	<limits.h>
+	<stdarg.h>
+	<string.h>
+	"lua.h"
+	"lapi.h"
+	"ldebug.h"
+	"ldo.h"
+	"lfunc.h"
+	"lgc.h"
+	"lmem.h"
+	"lobject.h"
+	"lstate.h"
+	"lstring.h"
+	"ltable.h"
+	"ltm.h"
+	"lundump.h"
+	"lvm.h"
+
+1615818771 c:\users\arman\documents\github\pnlua\lua\lprefix.h
+
+1615818772 c:\users\arman\documents\github\pnlua\lua\lua.h
+	<stdarg.h>
+	<stddef.h>
+	"luaconf.h"
+
+1615818772 c:\users\arman\documents\github\pnlua\lua\luaconf.h
+	<limits.h>
+	<stddef.h>
+	<stdint.h>
+	<assert.h>
+
+1615818769 c:\users\arman\documents\github\pnlua\lua\lapi.h
+	"llimits.h"
+	"lstate.h"
+
+1615818770 c:\users\arman\documents\github\pnlua\lua\llimits.h
+	<limits.h>
+	<stddef.h>
+	"lua.h"
+	<assert.h>
+
+1615818771 c:\users\arman\documents\github\pnlua\lua\lstate.h
+	"lua.h"
+	"lobject.h"
+	"ltm.h"
+	"lzio.h"
+	<signal.h>
+
+1615818771 c:\users\arman\documents\github\pnlua\lua\lobject.h
+	<stdarg.h>
+	"llimits.h"
+	"lua.h"
+
+1615818771 c:\users\arman\documents\github\pnlua\lua\ltm.h
+	"lobject.h"
+
+1615818772 c:\users\arman\documents\github\pnlua\lua\lzio.h
+	"lua.h"
+	"lmem.h"
+
+1615818770 c:\users\arman\documents\github\pnlua\lua\lmem.h
+	<stddef.h>
+	"llimits.h"
+	"lua.h"
+
+1615818770 c:\users\arman\documents\github\pnlua\lua\ldebug.h
+	"lstate.h"
+
+1615818770 c:\users\arman\documents\github\pnlua\lua\ldo.h
+	"lobject.h"
+	"lstate.h"
+	"lzio.h"
+
+1615818770 c:\users\arman\documents\github\pnlua\lua\lfunc.h
+	"lobject.h"
+
+1615818770 c:\users\arman\documents\github\pnlua\lua\lgc.h
+	"lobject.h"
+	"lstate.h"
+
+1615818771 c:\users\arman\documents\github\pnlua\lua\lstring.h
+	"lgc.h"
+	"lobject.h"
+	"lstate.h"
+
+1615818771 c:\users\arman\documents\github\pnlua\lua\ltable.h
+	"lobject.h"
+
+1615818772 c:\users\arman\documents\github\pnlua\lua\lundump.h
+	"llimits.h"
+	"lobject.h"
+	"lzio.h"
+
+1615818772 c:\users\arman\documents\github\pnlua\lua\lvm.h
+	"ldo.h"
+	"lobject.h"
+	"ltm.h"
+
+1615818769 source:c:\users\arman\documents\github\pnlua\lua\lauxlib.c
+	"lprefix.h"
+	<errno.h>
+	<stdarg.h>
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	"lua.h"
+	"lauxlib.h"
+	<sys/wait.h>
+
+1615818769 c:\users\arman\documents\github\pnlua\lua\lauxlib.h
+	<stddef.h>
+	<stdio.h>
+	"luaconf.h"
+	"lua.h"
+	<assert.h>
+
+1615818769 source:c:\users\arman\documents\github\pnlua\lua\lbaselib.c
+	"lprefix.h"
+	<ctype.h>
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	"lua.h"
+	"lauxlib.h"
+	"lualib.h"
+
+1615818772 c:\users\arman\documents\github\pnlua\lua\lualib.h
+	"lua.h"
+
+1615818769 source:c:\users\arman\documents\github\pnlua\lua\lcode.c
+	"lprefix.h"
+	<limits.h>
+	<math.h>
+	<stdlib.h>
+	"lua.h"
+	"lcode.h"
+	"ldebug.h"
+	"ldo.h"
+	"lgc.h"
+	"llex.h"
+	"lmem.h"
+	"lobject.h"
+	"lopcodes.h"
+	"lparser.h"
+	"lstring.h"
+	"ltable.h"
+	"lvm.h"
+
+1615818769 c:\users\arman\documents\github\pnlua\lua\lcode.h
+	"llex.h"
+	"lobject.h"
+	"lopcodes.h"
+	"lparser.h"
+
+1615818770 c:\users\arman\documents\github\pnlua\lua\llex.h
+	<limits.h>
+	"lobject.h"
+	"lzio.h"
+
+1615818771 c:\users\arman\documents\github\pnlua\lua\lopcodes.h
+	"llimits.h"
+
+1615818771 c:\users\arman\documents\github\pnlua\lua\lparser.h
+	"llimits.h"
+	"lobject.h"
+	"lzio.h"
+
+1615818769 source:c:\users\arman\documents\github\pnlua\lua\lcorolib.c
+	"lprefix.h"
+	<stdlib.h>
+	"lua.h"
+	"lauxlib.h"
+	"lualib.h"
+
+1615818769 source:c:\users\arman\documents\github\pnlua\lua\lctype.c
+	"lprefix.h"
+	"lctype.h"
+	<limits.h>
+
+1615818769 c:\users\arman\documents\github\pnlua\lua\lctype.h
+	"lua.h"
+	<limits.h>
+	"llimits.h"
+	<ctype.h>
+
+1615818769 source:c:\users\arman\documents\github\pnlua\lua\ldblib.c
+	"lprefix.h"
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	"lua.h"
+	"lauxlib.h"
+	"lualib.h"
+
+1615818769 source:c:\users\arman\documents\github\pnlua\lua\ldebug.c
+	"lprefix.h"
+	<stdarg.h>
+	<stddef.h>
+	<string.h>
+	"lua.h"
+	"lapi.h"
+	"lcode.h"
+	"ldebug.h"
+	"ldo.h"
+	"lfunc.h"
+	"lobject.h"
+	"lopcodes.h"
+	"lstate.h"
+	"lstring.h"
+	"ltable.h"
+	"ltm.h"
+	"lvm.h"
+
+1615818770 source:c:\users\arman\documents\github\pnlua\lua\ldo.c
+	"lprefix.h"
+	<setjmp.h>
+	<stdlib.h>
+	<string.h>
+	"lua.h"
+	"lapi.h"
+	"ldebug.h"
+	"ldo.h"
+	"lfunc.h"
+	"lgc.h"
+	"lmem.h"
+	"lobject.h"
+	"lopcodes.h"
+	"lparser.h"
+	"lstate.h"
+	"lstring.h"
+	"ltable.h"
+	"ltm.h"
+	"lundump.h"
+	"lvm.h"
+	"lzio.h"
+
+1615818770 source:c:\users\arman\documents\github\pnlua\lua\ldump.c
+	"lprefix.h"
+	<stddef.h>
+	"lua.h"
+	"lobject.h"
+	"lstate.h"
+	"lundump.h"
+
+1615818770 source:c:\users\arman\documents\github\pnlua\lua\lfunc.c
+	"lprefix.h"
+	<stddef.h>
+	"lua.h"
+	"ldebug.h"
+	"ldo.h"
+	"lfunc.h"
+	"lgc.h"
+	"lmem.h"
+	"lobject.h"
+	"lstate.h"
+
+1615818770 source:c:\users\arman\documents\github\pnlua\lua\lgc.c
+	"lprefix.h"
+	<stdio.h>
+	<string.h>
+	"lua.h"
+	"ldebug.h"
+	"ldo.h"
+	"lfunc.h"
+	"lgc.h"
+	"lmem.h"
+	"lobject.h"
+	"lstate.h"
+	"lstring.h"
+	"ltable.h"
+	"ltm.h"
+
+1615818770 source:c:\users\arman\documents\github\pnlua\lua\linit.c
+	"lprefix.h"
+	<stddef.h>
+	"lua.h"
+	"lualib.h"
+	"lauxlib.h"
+
+1615818770 source:c:\users\arman\documents\github\pnlua\lua\liolib.c
+	"lprefix.h"
+	<ctype.h>
+	<errno.h>
+	<locale.h>
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	"lua.h"
+	"lauxlib.h"
+	"lualib.h"
+	<sys/types.h>
+
+1615818770 source:c:\users\arman\documents\github\pnlua\lua\llex.c
+	"lprefix.h"
+	<locale.h>
+	<string.h>
+	"lua.h"
+	"lctype.h"
+	"ldebug.h"
+	"ldo.h"
+	"lgc.h"
+	"llex.h"
+	"lobject.h"
+	"lparser.h"
+	"lstate.h"
+	"lstring.h"
+	"ltable.h"
+	"lzio.h"
+
+1615818770 source:c:\users\arman\documents\github\pnlua\lua\lmathlib.c
+	"lprefix.h"
+	<float.h>
+	<limits.h>
+	<math.h>
+	<stdlib.h>
+	<time.h>
+	"lua.h"
+	"lauxlib.h"
+	"lualib.h"
+
+1615818770 source:c:\users\arman\documents\github\pnlua\lua\lmem.c
+	"lprefix.h"
+	<stddef.h>
+	"lua.h"
+	"ldebug.h"
+	"ldo.h"
+	"lgc.h"
+	"lmem.h"
+	"lobject.h"
+	"lstate.h"
+
+1615818770 source:c:\users\arman\documents\github\pnlua\lua\loadlib.c
+	"lprefix.h"
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	"lua.h"
+	"lauxlib.h"
+	"lualib.h"
+	<dlfcn.h>
+	<windows.h>
+
+1615818770 source:c:\users\arman\documents\github\pnlua\lua\lobject.c
+	"lprefix.h"
+	<locale.h>
+	<math.h>
+	<stdarg.h>
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	"lua.h"
+	"lctype.h"
+	"ldebug.h"
+	"ldo.h"
+	"lmem.h"
+	"lobject.h"
+	"lstate.h"
+	"lstring.h"
+	"lvm.h"
+
+1615818771 source:c:\users\arman\documents\github\pnlua\lua\lopcodes.c
+	"lprefix.h"
+	"lopcodes.h"
+
+1615818771 source:c:\users\arman\documents\github\pnlua\lua\loslib.c
+	"lprefix.h"
+	<errno.h>
+	<locale.h>
+	<stdlib.h>
+	<string.h>
+	<time.h>
+	"lua.h"
+	"lauxlib.h"
+	"lualib.h"
+	<unistd.h>
+
+1615818771 source:c:\users\arman\documents\github\pnlua\lua\lparser.c
+	"lprefix.h"
+	<limits.h>
+	<string.h>
+	"lua.h"
+	"lcode.h"
+	"ldebug.h"
+	"ldo.h"
+	"lfunc.h"
+	"llex.h"
+	"lmem.h"
+	"lobject.h"
+	"lopcodes.h"
+	"lparser.h"
+	"lstate.h"
+	"lstring.h"
+	"ltable.h"
+
+1615818771 source:c:\users\arman\documents\github\pnlua\lua\lstate.c
+	"lprefix.h"
+	<stddef.h>
+	<string.h>
+	"lua.h"
+	"lapi.h"
+	"ldebug.h"
+	"ldo.h"
+	"lfunc.h"
+	"lgc.h"
+	"llex.h"
+	"lmem.h"
+	"lstate.h"
+	"lstring.h"
+	"ltable.h"
+	"ltm.h"
+	<time.h>
+
+1615818771 source:c:\users\arman\documents\github\pnlua\lua\lstring.c
+	"lprefix.h"
+	<string.h>
+	"lua.h"
+	"ldebug.h"
+	"ldo.h"
+	"lmem.h"
+	"lobject.h"
+	"lstate.h"
+	"lstring.h"
+
+1615818771 source:c:\users\arman\documents\github\pnlua\lua\lstrlib.c
+	"lprefix.h"
+	<ctype.h>
+	<float.h>
+	<limits.h>
+	<locale.h>
+	<math.h>
+	<stddef.h>
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	"lua.h"
+	"lauxlib.h"
+	"lualib.h"
+
+1615818771 source:c:\users\arman\documents\github\pnlua\lua\ltable.c
+	"lprefix.h"
+	<math.h>
+	<limits.h>
+	"lua.h"
+	"ldebug.h"
+	"ldo.h"
+	"lgc.h"
+	"lmem.h"
+	"lobject.h"
+	"lstate.h"
+	"lstring.h"
+	"ltable.h"
+	"lvm.h"
+
+1615818771 source:c:\users\arman\documents\github\pnlua\lua\ltablib.c
+	"lprefix.h"
+	<limits.h>
+	<stddef.h>
+	<string.h>
+	"lua.h"
+	"lauxlib.h"
+	"lualib.h"
+	<time.h>
+
+1615818771 source:c:\users\arman\documents\github\pnlua\lua\ltm.c
+	"lprefix.h"
+	<string.h>
+	"lua.h"
+	"ldebug.h"
+	"ldo.h"
+	"lgc.h"
+	"lobject.h"
+	"lstate.h"
+	"lstring.h"
+	"ltable.h"
+	"ltm.h"
+	"lvm.h"
+
+1615818771 source:c:\users\arman\documents\github\pnlua\lua\lua.c
+	"lprefix.h"
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<signal.h>
+	"lua.h"
+	"lauxlib.h"
+	"lualib.h"
+	<unistd.h>
+	<io.h>
+	<windows.h>
+	<readline/readline.h>
+	<readline/history.h>
+
+1631217743 source:c:\users\arman\documents\github\pnlua\lua\luac.c
+	"lprefix.h"
+	<ctype.h>
+	<errno.h>
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	"lua.h"
+	"lauxlib.h"
+	"ldebug.h"
+	"lobject.h"
+	"lopcodes.h"
+	"lopnames.h"
+	"lstate.h"
+	"lundump.h"
+
+1615818771 c:\users\arman\documents\github\pnlua\lua\lopnames.h
+	<stddef.h>
+
+1615818772 source:c:\users\arman\documents\github\pnlua\lua\lundump.c
+	"lprefix.h"
+	<limits.h>
+	<string.h>
+	"lua.h"
+	"ldebug.h"
+	"ldo.h"
+	"lfunc.h"
+	"lmem.h"
+	"lobject.h"
+	"lstring.h"
+	"lundump.h"
+	"lzio.h"
+
+1615818772 source:c:\users\arman\documents\github\pnlua\lua\lutf8lib.c
+	"lprefix.h"
+	<assert.h>
+	<limits.h>
+	<stdlib.h>
+	<string.h>
+	"lua.h"
+	"lauxlib.h"
+	"lualib.h"
+
+1615818772 source:c:\users\arman\documents\github\pnlua\lua\lvm.c
+	"lprefix.h"
+	<float.h>
+	<limits.h>
+	<math.h>
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	"lua.h"
+	"ldebug.h"
+	"ldo.h"
+	"lfunc.h"
+	"lgc.h"
+	"lobject.h"
+	"lopcodes.h"
+	"lstate.h"
+	"lstring.h"
+	"ltable.h"
+	"ltm.h"
+	"lvm.h"
+	"ljumptab.h"
+
+1615818770 c:\users\arman\documents\github\pnlua\lua\ljumptab.h
+
+1615818772 source:c:\users\arman\documents\github\pnlua\lua\lzio.c
+	"lprefix.h"
+	<string.h>
+	"lua.h"
+	"llimits.h"
+	"lmem.h"
+	"lstate.h"
+	"lzio.h"
+
+1103766784 c:\users\arman\documents\github\pnlua\lua\lua.hpp
+	"lua.h"
+	"lualib.h"
+	"lauxlib.h"
+
+1631223149 c:\users\arman\documents\github\pnlua\pnlua.h
+
