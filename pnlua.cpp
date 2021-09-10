@@ -63,7 +63,7 @@ void send_error(lua_State* state) {
        stack. */
 
     const char* message = lua_tostring(state, -1);
-    int async_load = CreateDsMap( 0 );
+    int async_load = CreateDsMap(0);
 
     DsMapAddString(async_load, (char*)"event_type", (char*)"PNLuaError");
     DsMapAddString(async_load, (char*)"error_message", (char*)message);
