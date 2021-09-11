@@ -1,16 +1,4 @@
-/* ---
-   LUA
-   --- */
-
-/* -------------
-   GML FUNCTIONS
-   ------------- */
-
 #define GM_EXPORT extern "C" __declspec(dllexport)
-
-GM_EXPORT double pnlua_state_create();
-GM_EXPORT double pnlua_state_destroy(double id);
-GM_EXPORT double pnlua_state_load(double id, char* filename);
 
 /* ------------
    ASYNCHRONOUS
@@ -19,3 +7,15 @@ GM_EXPORT double pnlua_state_load(double id, char* filename);
 GM_EXPORT void RegisterCallbacks(char* arg1, char* arg2, char* arg3, char* arg4);
 
 void send_error(lua_State* state);
+
+int gm_call(lua_State* state);
+
+/* -------------
+   GML FUNCTIONS
+   ------------- */
+
+GM_EXPORT double pnlua_state_create();
+GM_EXPORT double pnlua_state_destroy(double id);
+GM_EXPORT double pnlua_state_load(double id, char* filename);
+GM_EXPORT double pnlua_state_register(double id, char* function_name, double function);
+GM_EXPORT double pnlua_state_call(double id, char* function_name);
