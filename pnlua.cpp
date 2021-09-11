@@ -50,14 +50,15 @@ int gm_call(lua_State* state) {
     lua_pushvalue(state, lua_upvalueindex(1));
 
     int args = lua_gettop(state) - 1;
-    int callback = (int)lua_tonumber(state, args + 1);
+    char* callback = (char*)lua_tostring(state, args + 1);
 
     int ds_map = CreateDsMap(0);
 
     DsMapAddString(ds_map, (char*)"event_type", (char*)"PNLuaCall");
-    DsMapAddDouble(ds_map, (char*)"function", (double)callback);
+    DsMapAddDouble(ds_map, (char*)"state", (double)(size_t)state);
+    DsMapAddString(ds_map, (char*)"function", callback);
 
-    for (int i = 0; i <= args - 1; i++) {
+    for (int i = 0; i < args; i++) {
         std::string arg_str = std::to_string(i);
         const char* arg = arg_str.c_str();
 
@@ -65,7 +66,7 @@ int gm_call(lua_State* state) {
             DsMapAddString(ds_map, (char*)arg, (char*)lua_tostring(state, i + 1));
         } else {
             if (lua_type(state, i + 1) == LUA_TNUMBER) {
-                DsMapAddDouble(ds_map, (char*)arg, (double)lua_tonumber(state, i + 1));
+                DsMapAddDouble(ds_map, (char*)arg, lua_tonumber(state, i + 1));
             }
         }
     }
@@ -79,7 +80,7 @@ int gm_call(lua_State* state) {
    GML FUNCTIONS
    ------------- */
 
-GM_EXPORT double pnlua_state_create() {
+GM_EXPORT double pnlua_state_create_internal() {
     lua_State* state = luaL_newstate();
 
     if (state == NULL) {
@@ -91,7 +92,7 @@ GM_EXPORT double pnlua_state_create() {
     return (double)(size_t)state;
 }
 
-GM_EXPORT double pnlua_state_destroy(double id) {
+GM_EXPORT double pnlua_state_destroy_internal(double id) {
     lua_State* state = (lua_State*)(size_t)id;
 
     if (state == NULL) {
@@ -110,7 +111,7 @@ GM_EXPORT double pnlua_state_load(double id, char* filename) {
         return GM_FALSE;
     }
 
-    if (luaL_loadfile(state, filename) != LUA_OK) {
+    if (luaL_loadfile(state, filename) != LUA_OK || lua_pcall(state, 0, LUA_MULTRET, 0) != LUA_OK) {
         send_error(state);
 
         return GM_FALSE;
@@ -119,17 +120,18 @@ GM_EXPORT double pnlua_state_load(double id, char* filename) {
     return GM_TRUE;
 }
 
-GM_EXPORT double pnlua_state_register(double id, char* function_name, double function) {
+GM_EXPORT double pnlua_state_register_internal(double id, char* function_name) {
     lua_State* state = (lua_State*)(size_t)id;
 
     if (state == NULL) {
         return GM_FALSE;
     }
 
+    lua_pushstring(state, function_name);
+    lua_pushcclosure(state, gm_call, 1);
+
     std::string function_string = function_name;
 
-    lua_pushnumber(state, (int)function);
-    lua_pushcclosure(state, gm_call, 1);
     lua_setglobal(state, function_string.c_str());
 
     return GM_TRUE;
@@ -144,7 +146,7 @@ GM_EXPORT double pnlua_state_call(double id, char* function_name) {
 
 	lua_getglobal(state, function_name);
 
-	if (lua_pcall(state, 0, LUA_MULTRET, 0) != LUA_OK) {
+	if (lua_pcall(state, 0, 1, 0) != LUA_OK) {
         send_error(state);
 
         return GM_FALSE;
