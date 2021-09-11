@@ -3,4 +3,4 @@
 
  Requires Lua 5.3.4 (place all src files in a "lua" folder).
  
- (wiki coming soon)
+ Made in VS2019.

@@ -2,3 +2,6 @@
 PNLua.cbp
 PNLua.depend
 PNLua.layout
+Debug/
+Release/
+.vs/
