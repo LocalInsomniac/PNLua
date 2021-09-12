@@ -7,6 +7,8 @@
  
 # TODO
  * Compile for Linux
+
+ * Is there really no other way to pass from Lua to GameMaker without using Async event?
  
  * Pause Lua state until GML function call is done
  
