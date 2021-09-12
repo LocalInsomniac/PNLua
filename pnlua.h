@@ -17,5 +17,6 @@ int gm_call(lua_State* state);
 GM_EXPORT double pnlua_state_create_internal();
 GM_EXPORT double pnlua_state_destroy_internal(double id);
 GM_EXPORT double pnlua_state_load(double id, char* filename);
-GM_EXPORT double pnlua_state_register_internal(double id, char* function_name, double function);
+GM_EXPORT double pnlua_state_register_internal(double id, char* function_name);
 GM_EXPORT double pnlua_state_call(double id, char* function_name);
+GM_EXPORT double pnlua_state_resume_internal(double id);

@@ -60,20 +60,20 @@ int gm_call(lua_State* state) {
 
     for (int i = 0; i < args; i++) {
         std::string arg_str = std::to_string(i);
-        const char* arg = arg_str.c_str();
+        char* arg = (char*)arg_str.c_str();
 
         if (lua_type(state, i + 1) == LUA_TSTRING) {
-            DsMapAddString(ds_map, (char*)arg, (char*)lua_tostring(state, i + 1));
+            DsMapAddString(ds_map, arg, (char*)lua_tostring(state, i + 1));
         } else {
             if (lua_type(state, i + 1) == LUA_TNUMBER) {
-                DsMapAddDouble(ds_map, (char*)arg, lua_tonumber(state, i + 1));
+                DsMapAddDouble(ds_map, arg, lua_tonumber(state, i + 1));
             }
         }
     }
 
     CreateAsynEventWithDSMap(ds_map, EVENT_OTHER_SOCIAL);
 
-    return 1;
+    return lua_yield(state, 0);
 }
 
 /* -------------
@@ -155,4 +155,26 @@ GM_EXPORT double pnlua_state_call(double id, char* function_name) {
     lua_pop(state, 1);
 
     return GM_TRUE;
+}
+
+GM_EXPORT double pnlua_state_resume_internal(double id) {
+    lua_State* state = (lua_State*)(size_t)id;
+
+    if (state == NULL) {
+        return GM_FALSE;
+    }
+
+    int result = lua_resume(state, NULL, 0, 0);
+
+    if (result == LUA_OK) {
+        return GM_TRUE;
+    } else {
+        if (result > LUA_YIELD) {
+            send_error(state);
+
+            return GM_FALSE;
+        }
+    }
+
+    return GM_FALSE;
 }
