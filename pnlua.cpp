@@ -6,6 +6,28 @@
 #define GM_TRUE 1.0
 #define GM_FALSE 0.0
 
+/* -----------
+   PNLUA STATE
+   ----------- */
+
+PNLuaState::PNLuaState() {}
+
+PNLuaState* new_pnluastate() {
+    PNLuaState* state = new PNLuaState();
+    lua_State* lua_state = luaL_newstate();
+
+    if (lua_state == NULL) {
+        delete state;
+
+        return NULL;
+    }
+
+    luaL_openlibs(lua_state);
+    state->state = lua_state;
+    
+    return state;
+}
+
 /* ------------
    ASYNCHRONOUS
    ------------ */
@@ -47,6 +69,8 @@ void send_error(lua_State* state) {
 }
 
 int gm_call(lua_State* state) {
+    // TODO: Yield the state until the GML function call has sent a return value.
+
     lua_pushvalue(state, lua_upvalueindex(1));
 
     int args = lua_gettop(state) - 1;
@@ -73,7 +97,7 @@ int gm_call(lua_State* state) {
 
     CreateAsynEventWithDSMap(ds_map, EVENT_OTHER_SOCIAL);
 
-    return lua_yield(state, 0);
+    return 1;
 }
 
 /* -------------
@@ -81,38 +105,40 @@ int gm_call(lua_State* state) {
    ------------- */
 
 GM_EXPORT double pnlua_state_create_internal() {
-    lua_State* state = luaL_newstate();
+    PNLuaState* state = new_pnluastate();
 
     if (state == NULL) {
         return -1.0;
     }
 
-    luaL_openlibs(state);
-
     return (double)(size_t)state;
 }
 
 GM_EXPORT double pnlua_state_destroy_internal(double id) {
-    lua_State* state = (lua_State*)(size_t)id;
+    PNLuaState* state = (PNLuaState*)(size_t)id;
 
     if (state == NULL) {
         return GM_FALSE;
     }
 
-    lua_close(state);
+    lua_close(state->state);
+
+    delete state;
 
     return GM_TRUE;
 }
 
 GM_EXPORT double pnlua_state_load(double id, char* filename) {
-    lua_State* state = (lua_State*)(size_t)id;
+    PNLuaState* state = (PNLuaState*)(size_t)id;
 
     if (state == NULL) {
         return GM_FALSE;
     }
 
-    if (luaL_loadfile(state, filename) != LUA_OK || lua_pcall(state, 0, LUA_MULTRET, 0) != LUA_OK) {
-        send_error(state);
+    lua_State* get_state = state->state;
+
+    if (luaL_loadfile(get_state, filename) != LUA_OK || lua_pcall(get_state, 0, 1, 0) != LUA_OK) {
+        send_error(get_state);
 
         return GM_FALSE;
     }
@@ -121,60 +147,54 @@ GM_EXPORT double pnlua_state_load(double id, char* filename) {
 }
 
 GM_EXPORT double pnlua_state_register_internal(double id, char* function_name) {
-    lua_State* state = (lua_State*)(size_t)id;
+    PNLuaState* state = (PNLuaState*)(size_t)id;
 
     if (state == NULL) {
         return GM_FALSE;
     }
 
-    lua_pushstring(state, function_name);
-    lua_pushcclosure(state, gm_call, 1);
+    lua_State* get_state = state->state;
+
+    lua_pushstring(get_state, function_name);
+    lua_pushcclosure(get_state, gm_call, 1);
 
     std::string function_string = function_name;
 
-    lua_setglobal(state, function_string.c_str());
+    lua_setglobal(get_state, function_string.c_str());
 
     return GM_TRUE;
 }
 
 GM_EXPORT double pnlua_state_call(double id, char* function_name) {
-    lua_State* state = (lua_State*)(size_t)id;
+    PNLuaState* state = (PNLuaState*)(size_t)id;
 
     if (state == NULL) {
         return GM_FALSE;
     }
 
-	lua_getglobal(state, function_name);
+    lua_State* get_state = state->state;
 
-	if (lua_pcall(state, 0, 1, 0) != LUA_OK) {
-        send_error(state);
+	lua_getglobal(get_state, function_name);
+
+	if (lua_pcall(get_state, 0, 1, 0) != LUA_OK) {
+        send_error(get_state);
 
         return GM_FALSE;
 	}
     
-    lua_pop(state, 1);
+    lua_pop(get_state, 1);
 
     return GM_TRUE;
 }
 
 GM_EXPORT double pnlua_state_resume_internal(double id) {
-    lua_State* state = (lua_State*)(size_t)id;
+    PNLuaState* state = (PNLuaState*)(size_t)id;
 
     if (state == NULL) {
         return GM_FALSE;
     }
 
-    int result = lua_resume(state, NULL, 0, 0);
-
-    if (result == LUA_OK) {
-        return GM_TRUE;
-    } else {
-        if (result > LUA_YIELD) {
-            send_error(state);
-
-            return GM_FALSE;
-        }
-    }
+    // TODO: Resume the yielded state after the GML function call has returned a value.
 
     return GM_FALSE;
 }

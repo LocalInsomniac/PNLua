@@ -1,5 +1,18 @@
 #define GM_EXPORT extern "C" __declspec(dllexport)
 
+/* -----------
+   PNLUA STATE
+   ----------- */
+
+class PNLuaState {
+    public:
+        PNLuaState();
+        lua_State* state;
+        lua_State* thread;
+};
+
+PNLuaState* new_pnluastate();
+
 /* ------------
    ASYNCHRONOUS
    ------------ */
