@@ -1,21 +1,32 @@
-#define GM_EXPORT extern "C" __declspec(dllexport)
+#if !defined( _MSC_VER)
+#define GM_EXPORT __attribute__((visibility("default")))
+#else
+#define GM_EXPORT __declspec(dllexport)
+#endif
 
-/* ------------
-   ASYNCHRONOUS
-   ------------ */
+/* -----------
+   PNLUA STATE
+   ----------- */
 
-GM_EXPORT void RegisterCallbacks(char* arg1, char* arg2, char* arg3, char* arg4);
+class PNLuaState {
+    public:
+        PNLuaState();
 
-void send_error(lua_State* state);
+        lua_State* state;
+        lua_State* thread;
+};
 
-int gm_call(lua_State* state);
+PNLuaState* new_pnluastate();
 
 /* -------------
    GML FUNCTIONS
    ------------- */
 
-GM_EXPORT double pnlua_state_create_internal();
-GM_EXPORT double pnlua_state_destroy_internal(double id);
-GM_EXPORT double pnlua_state_load(double id, char* filename);
-GM_EXPORT double pnlua_state_register_internal(double id, char* function_name);
-GM_EXPORT double pnlua_state_call(double id, char* function_name, double object);
+extern "C" {
+    GM_EXPORT double pnlua_internal_init(void* buffer);
+    GM_EXPORT double pnlua_internal_state_create();
+    GM_EXPORT double pnlua_internal_state_destroy(double id);
+    GM_EXPORT double pnlua_internal_state_register(double id, char* function_name);
+    GM_EXPORT double pnlua_internal_state_load(double id, char* file_name);
+    //GM_EXPORT double pnlua_internal_state_call(double id, char* function_name);
+}

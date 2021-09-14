@@ -2,160 +2,126 @@
 #include "pnlua.h"
 #include <string>
 
-#define GM_EXPORT extern "C" __declspec(dllexport)
+#if !defined(_MSC_VER)
+#define GM_EXPORT __attribute__((visibility("default")))
+#else
+#define GM_EXPORT __declspec(dllexport)
+#endif
+
 #define GM_TRUE 1.0
 #define GM_FALSE 0.0
 
-/* ------------
-   ASYNCHRONOUS
-   ------------ */
+/* ----------------
+   GLOBAL VARIABLES
+   ---------------- */
 
-const int EVENT_OTHER_SOCIAL = 70;
+static PNLuaState* current_state = NULL;
+static void* current_buffer = NULL;
 
-void (*CreateAsynEventWithDSMap)(int, int) = NULL;
-int (*CreateDsMap)(int _num, ...) = NULL;
-bool (*DsMapAddDouble)(int _index, char* _pKey, double value) = NULL;
-bool (*DsMapAddString)(int _index, char* _pKey, char* pVal) = NULL;
+/* -----------
+   PNLUA STATE
+   ----------- */
 
-GM_EXPORT void RegisterCallbacks(char* arg1, char* arg2, char* arg3, char* arg4) {
-    void (*CreateAsynEventWithDSMapPtr)(int, int) = (void(*)(int, int))(arg1);
-    int (*CreateDsMapPtr)(int _num, ...) = (int(*)(int _num, ...))(arg2);
+PNLuaState::PNLuaState() {}
 
-    CreateAsynEventWithDSMap = CreateAsynEventWithDSMapPtr;
-    CreateDsMap = CreateDsMapPtr;
+/* This is a wrapper for creating a PNLuaState, since directly creating a
+   PNLuaState in a GM_EXPORT function will cause compile errors. */
+PNLuaState* new_pnluastate() {
+    lua_State* lua_state = luaL_newstate();
 
-    bool (*DsMapAddDoublePtr)(int _index, char* _pKey, double value) = (bool(*)(int, char*, double))(arg3);
-    bool (*DsMapAddStringPtr)(int _index, char* _pKey, char* pVal) = (bool(*)(int, char*, char*))(arg4);
-
-    DsMapAddDouble = DsMapAddDoublePtr;
-    DsMapAddString = DsMapAddStringPtr;
-}
-
-void send_error(lua_State* state) {
-    /* The error message is on top of the stack.
-       Fetch it, send it asynchronously to GameMaker and then pop it off the
-       stack. */
-
-    char* message = (char*)lua_tostring(state, -1);
-    int ds_map = CreateDsMap(0);
-
-    DsMapAddString(ds_map, (char*)"event_type", (char*)"PNLuaError");
-    DsMapAddString(ds_map, (char*)"error_message", (char*)message);
-    CreateAsynEventWithDSMap(ds_map, EVENT_OTHER_SOCIAL);
-
-    lua_pop(state, 1);
-}
-
-int gm_call(lua_State* state) {
-    // TODO: Yield the state until the GML function call has sent a return value.
-
-    lua_pushvalue(state, lua_upvalueindex(1));
-
-    int args = lua_gettop(state) - 1;
-    char* callback = (char*)lua_tostring(state, args + 1);
-
-    int ds_map = CreateDsMap(0);
-
-    DsMapAddString(ds_map, (char*)"event_type", (char*)"PNLuaCall");
-    DsMapAddDouble(ds_map, (char*)"state", (double)(size_t)state);
-    DsMapAddString(ds_map, (char*)"function", callback);
-
-    for (int i = 0; i < args; i++) {
-        std::string arg_str = std::to_string(i);
-        const char* arg = arg_str.c_str();
-
-        if (lua_type(state, i + 1) == LUA_TSTRING) {
-            DsMapAddString(ds_map, (char*)arg, (char*)lua_tostring(state, i + 1));
-        } else {
-            if (lua_type(state, i + 1) == LUA_TNUMBER) {
-                DsMapAddDouble(ds_map, (char*)arg, lua_tonumber(state, i + 1));
-            }
-        }
+    if (lua_state == NULL) {
+        return NULL;
     }
 
-    CreateAsynEventWithDSMap(ds_map, EVENT_OTHER_SOCIAL);
+    luaL_openlibs(lua_state);
 
-    return 0;
+    PNLuaState* state = new PNLuaState();
+
+    state->state = lua_state;
+
+    return state;
+}
+
+/* -------------
+   LUA FUNCTIONS
+   ------------- */
+
+int gm_call(lua_State* lua_state) {
+    // TODO: Buffer writing stuff goes here.
+
+    return lua_yield(lua_state, 1);
 }
 
 /* -------------
    GML FUNCTIONS
    ------------- */
 
-GM_EXPORT double pnlua_state_create_internal() {
-    lua_State* state = luaL_newstate();
+extern "C" {
+    GM_EXPORT double pnlua_internal_init(void* buffer) {
+        current_buffer = buffer;
 
-    if (state == NULL) {
-        return -1.0;
+        return GM_TRUE;
     }
 
-    luaL_openlibs(state);
+    GM_EXPORT double pnlua_internal_state_create() {
+        PNLuaState* state = new_pnluastate();
 
-    return (double)(size_t)state;
-}
+        if (state == NULL) {
+            return -1.0;
+        }
 
-GM_EXPORT double pnlua_state_destroy_internal(double id) {
-    lua_State* state = (lua_State*)(size_t)id;
-
-    if (state == NULL) {
-        return GM_FALSE;
+        return (double)(size_t)state;
     }
 
-    lua_close(state);
+    GM_EXPORT double pnlua_internal_state_destroy(double id) {
+        PNLuaState* state = (PNLuaState*)(size_t)id;
 
-    return GM_TRUE;
-}
+        if (state == NULL) {
+            return GM_FALSE;
+        }
 
-GM_EXPORT double pnlua_state_load(double id, char* filename) {
-    lua_State* state = (lua_State*)(size_t)id;
+        lua_close(state->state);
 
-    if (state == NULL) {
-        return GM_FALSE;
+        delete state;
+
+        return GM_TRUE;
     }
 
-    if (luaL_loadfile(state, filename) != LUA_OK || lua_pcall(state, 0, 1, 0) != LUA_OK) {
-        send_error(state);
+    GM_EXPORT double pnlua_internal_state_register(double id, char* function_name) {
+        PNLuaState* state = (PNLuaState*)(size_t)id;
 
-        return GM_FALSE;
+        if (state == NULL) {
+            return GM_FALSE;
+        }
+
+        lua_State* lua_state = state->state;
+
+        lua_pushstring(lua_state, function_name);
+        lua_pushcclosure(lua_state, gm_call, 1);
+        lua_setglobal(lua_state, function_name);
+
+        return GM_TRUE;
     }
 
-    return GM_TRUE;
-}
+    GM_EXPORT double pnlua_internal_state_load(double id, char* file_name) {
+        PNLuaState* state = (PNLuaState*)(size_t)id;
 
-GM_EXPORT double pnlua_state_register_internal(double id, char* function_name) {
-    lua_State* state = (lua_State*)(size_t)id;
+        if (state == NULL) {
+            return GM_FALSE;
+        }
 
-    if (state == NULL) {
-        return GM_FALSE;
+        lua_State* lua_state = state->state;
+
+        int result = luaL_loadfile(lua_state, file_name);
+
+        if (result != LUA_OK) {
+            // File load has failed, send the error to PNLua's buffer.
+            unsigned char* buffer = (unsigned char*)current_buffer;
+            strcpy((char*)buffer, lua_tostring(lua_state, -1));
+
+            return -1.0;
+        }
+
+        return GM_TRUE;
     }
-
-    lua_pushstring(state, function_name);
-    lua_pushcclosure(state, gm_call, 1);
-
-    std::string function_string = function_name;
-
-    lua_setglobal(state, function_string.c_str());
-
-    return GM_TRUE;
-}
-
-GM_EXPORT double pnlua_state_call(double id, char* function_name, double object) {
-    lua_State* state = (lua_State*)(size_t)id;
-
-    if (state == NULL) {
-        return GM_FALSE;
-    }
-
-	lua_getglobal(state, function_name);
-    lua_pushnumber(state, object);
-
-	if (lua_pcall(state, 1, 1, 0) != LUA_OK) {
-        send_error(state);
-
-        return GM_FALSE;
-	}
-    
-    lua_pop(state, 1);
-
-    return GM_TRUE;
 }

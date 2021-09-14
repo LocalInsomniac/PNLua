@@ -1,5 +1,6 @@
 {
   "resources": [
+    {"id":{"name":"pnlua_config","path":"scripts/pnlua_config/pnlua_config.yy",},"order":1,},
     {"id":{"name":"objExample","path":"objects/objExample/objExample.yy",},"order":0,},
     {"id":{"name":"PNLua","path":"extensions/PNLua/PNLua.yy",},"order":0,},
     {"id":{"name":"pnlua_system","path":"scripts/pnlua_system/pnlua_system.yy",},"order":0,},
