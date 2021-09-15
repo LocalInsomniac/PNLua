@@ -28,5 +28,5 @@ extern "C" {
     GM_EXPORT double pnlua_internal_state_destroy(double id);
     GM_EXPORT double pnlua_internal_state_register(double id, char* function_name);
     GM_EXPORT double pnlua_internal_state_load(double id, char* file_name);
-    //GM_EXPORT double pnlua_internal_state_call(double id, char* function_name);
+    GM_EXPORT double pnlua_internal_state_call(double id);
 }

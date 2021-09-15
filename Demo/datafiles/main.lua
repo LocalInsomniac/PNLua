@@ -1,1 +1,1 @@
-123 this script is defected
+print("PNLua OK")

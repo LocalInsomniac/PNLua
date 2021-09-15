@@ -32,12 +32,16 @@
             2,
             1,
           ],"resourceVersion":"1.0","name":"pnlua_internal_state_load","tags":[],"resourceType":"GMExtensionFunction",},
+        {"externalName":"pnlua_internal_state_call","kind":1,"help":"pnlua_internal_state_call(id)","hidden":false,"returnType":2,"argCount":0,"args":[
+            2,
+          ],"resourceVersion":"1.0","name":"pnlua_internal_state_call","tags":[],"resourceType":"GMExtensionFunction",},
       ],"constants":[],"ProxyFiles":[],"copyToTargets":192,"order":[
         {"name":"pnlua_internal_init","path":"extensions/PNLua/PNLua.yy",},
         {"name":"pnlua_internal_state_create","path":"extensions/PNLua/PNLua.yy",},
         {"name":"pnlua_internal_state_destroy","path":"extensions/PNLua/PNLua.yy",},
         {"name":"pnlua_internal_state_register","path":"extensions/PNLua/PNLua.yy",},
         {"name":"pnlua_internal_state_load","path":"extensions/PNLua/PNLua.yy",},
+        {"name":"pnlua_internal_state_call","path":"extensions/PNLua/PNLua.yy",},
       ],"resourceVersion":"1.0","name":"","tags":[],"resourceType":"GMExtensionFile",},
   ],
   "classname": "",

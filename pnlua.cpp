@@ -1,6 +1,8 @@
 #include "lua/lua.hpp"
 #include "pnlua.h"
 #include <string>
+#include <iostream>
+using namespace std;
 
 #if !defined(_MSC_VER)
 #define GM_EXPORT __attribute__((visibility("default")))
@@ -38,6 +40,7 @@ PNLuaState* new_pnluastate() {
     PNLuaState* state = new PNLuaState();
 
     state->state = lua_state;
+    state->thread = lua_newthread(state->state);
 
     return state;
 }
@@ -94,11 +97,9 @@ extern "C" {
             return GM_FALSE;
         }
 
-        lua_State* lua_state = state->state;
-
-        lua_pushstring(lua_state, function_name);
-        lua_pushcclosure(lua_state, gm_call, 1);
-        lua_setglobal(lua_state, function_name);
+        lua_pushstring(state->thread, function_name);
+        lua_pushcclosure(state->thread, gm_call, 1);
+        lua_setglobal(state->thread, function_name);
 
         return GM_TRUE;
     }
@@ -110,16 +111,48 @@ extern "C" {
             return GM_FALSE;
         }
 
-        lua_State* lua_state = state->state;
-
-        int result = luaL_loadfile(lua_state, file_name);
-
-        if (result != LUA_OK) {
+        if (luaL_loadfile(state->thread, file_name) != LUA_OK) {
             // File load has failed, send the error to PNLua's buffer.
             unsigned char* buffer = (unsigned char*)current_buffer;
-            strcpy((char*)buffer, lua_tostring(lua_state, -1));
+            strcpy((char*)buffer, lua_tostring(state->thread, -1));
 
             return -1.0;
+        }
+
+        return GM_TRUE;
+    }
+
+    GM_EXPORT double pnlua_internal_state_call(double id) {
+        PNLuaState* state = (PNLuaState*)(size_t)id;
+
+        if (state == NULL) {
+            return GM_FALSE;
+        }
+        
+        unsigned char* buffer = (unsigned char*)current_buffer;
+        
+        /* Check the header of the buffer to see what type of call we're
+           dealing with. */
+
+        if (!(unsigned __int8)buffer[0]) {
+            /* We're calling the entire script, so duplicate it to prevent
+               any errors when calling it more than just once. */
+            lua_pushvalue(state->thread, 1);
+        }
+
+        switch (lua_pcall(state->thread, 0, 0, 0)) {
+            case LUA_OK:
+                return GM_TRUE;
+
+            case LUA_YIELD:
+                // Lua is waiting for a GM return value
+                return 2.0;
+
+            default:
+                // Lua call has failed, send the error to PNLua's buffer.
+                strcpy((char*)buffer, lua_tostring(state->thread, -1));
+
+                return -1.0;
         }
 
         return GM_TRUE;

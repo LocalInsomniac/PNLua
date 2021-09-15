@@ -13,7 +13,14 @@ pnlua_state_register(my_state, "variable_instance_set", function () {
 
 // Load the test script, pass our instance ID to the "create" function and call it.
 pnlua_state_load(my_state, "main.lua")
-//pnlua_state_call(my_state, "create", id)
+
+var start_time = current_time
+
+repeat 1000 {
+	pnlua_state_call(my_state)
+}
+
+show_debug_message("Call stress test time: " + string(current_time - start_time) + " ms");
 
 // Lua will manipulate these variables every step using variable_instance_set.
 random_number = 0
