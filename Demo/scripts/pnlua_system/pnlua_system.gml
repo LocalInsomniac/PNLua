@@ -47,6 +47,18 @@ function pnlua_state_load(id, file_name) {
 	pnlua_internal_state_register(id, function_name)
 }*/
 
+/* GROSS HACK: Input every single character in the string as an integer, so the
+   DLL can read the strings from the buffer. */
+function ___pnlua_buffer_write_string(str) {
+	var strlen = string_length(str)
+	
+	buffer_write(global.___pnlua_buffer, buffer_f32, strlen)
+	
+	for (var i = 0; i < strlen; i++) {
+		buffer_write(global.___pnlua_buffer, buffer_f32, ord(string_char_at(str, i + 1)))
+	}
+}
+
 /// @desc Execute a script/function loaded within a Lua state.
 /// @param {PNLuaState} id The pointer of the Lua state to execute.
 /// @param {string} [function_name] The name of the function to call from the script.
@@ -75,7 +87,7 @@ function pnlua_state_call() {
 		}
 	}
 	
-	// Pass stuff to the state using a buffer
+	// Start passing stuff to the state using a buffer
 	buffer_seek(global.___pnlua_buffer, buffer_seek_start, 0)
 	
 	/* Header types:
@@ -83,10 +95,10 @@ function pnlua_state_call() {
 	   1 = function without arguments
 	   2 = function with arguments */
 
-	buffer_write(global.___pnlua_buffer, buffer_u8, is_undefined(function_name) and is_undefined(function_args) ? 0 : (is_undefined(function_args) ? 1 : 2))
+	buffer_write(global.___pnlua_buffer, buffer_f32, is_undefined(function_name) and is_undefined(function_args) ? 0 : (is_undefined(function_args) ? 1 : 2))
 
 	if not is_undefined(function_name) {
-		buffer_write(global.___pnlua_buffer, buffer_string, function_name)
+		___pnlua_buffer_write_string(function_name)
 		
 		if not is_undefined(function_args) {
 			/* Argument types:
@@ -99,23 +111,23 @@ function pnlua_state_call() {
 			var args_length = array_length(function_args)
 			var i = 0
 			
-			buffer_write(global.___pnlua_buffer, buffer_u32, args_length)
+			buffer_write(global.___pnlua_buffer, buffer_f32, args_length)
 
 			repeat args_length {
 				var arg = function_args[i]
 				
 				if is_undefined(arg) {
 					repeat 2 {
-						buffer_write(global.___pnlua_buffer, buffer_u8, 0)
+						buffer_write(global.___pnlua_buffer, buffer_f32, 0)
 					}
 				} else {
 					if is_real(arg) {
-						buffer_write(global.___pnlua_buffer, buffer_u8, 1)
+						buffer_write(global.___pnlua_buffer, buffer_f32, 1)
 						buffer_write(global.___pnlua_buffer, buffer_f32, arg)
 					} else {
 						if is_string(arg) {
-							buffer_write(global.___pnlua_buffer, buffer_u8, 2)
-							buffer_write(global.___pnlua_buffer, buffer_string, arg)
+							buffer_write(global.___pnlua_buffer, buffer_f32, 2)
+							___pnlua_buffer_write_string(arg)
 						} else {
 							show_error("!!! PNLua: Error in state " + string(_id) + " while calling '" + function_name + "': Unsupported data type in argument " + string(i) + " (" + string(arg) + ")", true)
 						}
@@ -131,7 +143,7 @@ function pnlua_state_call() {
 		case -1:
 			// There was an error calling the script, read the message from the buffer.
 			buffer_seek(global.___pnlua_buffer, buffer_seek_start, 0)
-			show_error("!!! PNLua: Error in state " + string(_id) + " while calling: " + buffer_read(global.___pnlua_buffer, buffer_string), true)
+			show_error("!!! PNLua: Error in state " + string(_id) + " while calling " + (is_undefined(function_name) ? "" : "'" + function_name + "'") + ": " + buffer_read(global.___pnlua_buffer, buffer_string), true)
 		break
 		
 		case 2:

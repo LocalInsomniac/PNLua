@@ -128,24 +128,81 @@ extern "C" {
         if (state == NULL) {
             return GM_FALSE;
         }
-        
-        unsigned char* buffer = (unsigned char*)current_buffer;
+
+        int args = 0;
+        float* buffer = (float*)current_buffer;
         
         /* Check the header of the buffer to see what type of call we're
            dealing with. */
 
-        if (!(unsigned __int8)buffer[0]) {
-            /* We're calling the entire script, so duplicate it to prevent
-               any errors when calling it more than just once. */
+        int call_type = (int)buffer[0];
+
+        if (!call_type) {
+            /* We're calling the entire script, so duplicate it to prevent any
+               errors when calling it more than just once. */
             lua_pushvalue(state->thread, 1);
+        } else {
+            /* We're calling a function either with or without any arguments.
+               Get the arguments and the name of the function. */
+
+            size_t function_length = (size_t)buffer[1];
+            char* function_name = new char[function_length + 1];
+
+            for (size_t i = 0; i < function_length; i++) {
+                function_name[i] = (int)buffer[2 + i];
+            }
+
+            function_name[function_length] = '\0';
+            lua_getglobal(state->thread, function_name);
+
+            delete[] function_name;
+
+            if (call_type == 2) {
+                // If the buffer contains arguments, push them into the stack.
+                int i = 2 + function_length;
+                args = (int)buffer[i];
+
+                i++;
+
+                for (int j = 0; j < args; j++) {
+                    int data_type = (int)buffer[i++];
+
+                    switch (data_type) {
+                        case 0: // nil
+                            lua_pushnil(state->thread);
+
+                            break;
+
+                        case 1: // number
+                            lua_pushnumber(state->thread, buffer[i++]);
+
+                            break;
+
+                        case 2: // string
+                            size_t length = (size_t)buffer[i++];
+                            char* argument = new char[length + 1];
+
+                            for (size_t k = 0; k < length; k++) {
+                                argument[k] = (int)buffer[i++];
+                            }
+
+                            argument[length] = '\0';
+                            lua_pushstring(state->thread, argument);
+
+                            delete[] argument;
+
+                            break;
+                    }
+                }
+            }
         }
 
-        switch (lua_pcall(state->thread, 0, 0, 0)) {
+        switch (lua_pcall(state->thread, args, 1, 0)) {
             case LUA_OK:
                 return GM_TRUE;
 
             case LUA_YIELD:
-                // Lua is waiting for a GM return value
+                // Lua is waiting for a return value from GameMaker.
                 return 2.0;
 
             default:
@@ -155,6 +212,6 @@ extern "C" {
                 return -1.0;
         }
 
-        return GM_TRUE;
+        return GM_FALSE;
     }
 }
