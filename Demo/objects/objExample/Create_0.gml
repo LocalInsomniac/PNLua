@@ -7,7 +7,7 @@ my_state = pnlua_state_create()
 pnlua_state_load(my_state, "main.lua")
 pnlua_state_call(my_state)
 pnlua_state_call(my_state, "foo")
-pnlua_state_call(my_state, "cluster", "Hi! ", "I am a", " useless function!")
+show_debug_message(string(pnlua_state_call(my_state, "cluster", 1.337, 666, 420.69)))
 game_end()
 
 exit

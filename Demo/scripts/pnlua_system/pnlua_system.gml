@@ -2,6 +2,31 @@ global.___pnlua_states = ds_map_create()
 global.___pnlua_buffer = buffer_create(PNLUA_MAX_BUFFER_SIZE, buffer_fixed, 1);
 pnlua_internal_init(buffer_get_address(global.___pnlua_buffer))
 
+function ___pnlua_buffer_start() {
+	buffer_seek(global.___pnlua_buffer, buffer_seek_start, 0)
+}
+
+function ___pnlua_buffer_write_string(str) {
+	var strlen = string_length(str)
+	
+	buffer_write(global.___pnlua_buffer, buffer_f32, strlen)
+	
+	for (var i = 0; i < strlen; i++) {
+		buffer_write(global.___pnlua_buffer, buffer_f32, ord(string_char_at(str, i + 1)))
+	}
+}
+
+function ___pnlua_buffer_read_string() {
+	var strlen = buffer_read(global.___pnlua_buffer, buffer_f32)
+	var str = ""
+	
+	repeat strlen {
+		str += chr(buffer_read(global.___pnlua_buffer, buffer_f32))
+	}
+	
+	return str
+}
+
 /// @desc Create a Lua state. Return its pointer.
 function pnlua_state_create() {
 	var state = pnlua_internal_state_create()
@@ -27,7 +52,7 @@ function pnlua_state_destroy(id) {
 function pnlua_state_load(id, file_name) {
 	if pnlua_internal_state_load(id, file_name) == -1 {
 		// There was an error loading the script, read the message from the buffer.
-		buffer_seek(global.___pnlua_buffer, buffer_seek_start, 0)
+		___pnlua_buffer_start()
 		show_error("!!! PNLua: Error in state " + string(id) + " while loading '" + file_name + "': " + buffer_read(global.___pnlua_buffer, buffer_string), true)
 	}
 }
@@ -46,18 +71,6 @@ function pnlua_state_load(id, file_name) {
 	ds_map_add(state, function_name, callback)
 	pnlua_internal_state_register(id, function_name)
 }*/
-
-/* GROSS HACK: Input every single character in the string as an integer, so the
-   DLL can read the strings from the buffer. */
-function ___pnlua_buffer_write_string(str) {
-	var strlen = string_length(str)
-	
-	buffer_write(global.___pnlua_buffer, buffer_f32, strlen)
-	
-	for (var i = 0; i < strlen; i++) {
-		buffer_write(global.___pnlua_buffer, buffer_f32, ord(string_char_at(str, i + 1)))
-	}
-}
 
 /// @desc Execute a script/function loaded within a Lua state.
 /// @param {PNLuaState} id The pointer of the Lua state to execute.
@@ -88,7 +101,7 @@ function pnlua_state_call() {
 	}
 	
 	// Start passing stuff to the state using a buffer
-	buffer_seek(global.___pnlua_buffer, buffer_seek_start, 0)
+	___pnlua_buffer_start()
 	
 	/* Header types:
 	   0 = no function specified
@@ -142,8 +155,24 @@ function pnlua_state_call() {
 	switch pnlua_internal_state_call(_id) {
 		case -1:
 			// There was an error calling the script, read the message from the buffer.
-			buffer_seek(global.___pnlua_buffer, buffer_seek_start, 0)
+			___pnlua_buffer_start()
 			show_error("!!! PNLua: Error in state " + string(_id) + " while calling " + (is_undefined(function_name) ? "" : "'" + function_name + "'") + ": " + buffer_read(global.___pnlua_buffer, buffer_string), true)
+		break
+		
+		case 1:
+			// Lua call has finished, get the return value from the buffer.
+			___pnlua_buffer_start()
+			
+			switch buffer_read(global.___pnlua_buffer, buffer_f32) {
+				case 0:
+				return undefined
+				
+				case 1:
+				return buffer_read(global.___pnlua_buffer, buffer_f32)
+				
+				case 2:
+				return ___pnlua_buffer_read_string()
+			}
 		break
 		
 		case 2:
