@@ -202,32 +202,37 @@ extern "C" {
                 int idx = lua_gettop(state->thread);
 
                 switch (lua_type(state->thread, idx)) {
-                case LUA_TNONE:
-                case LUA_TNIL:
-                    buffer[0] = (float)0;
+                    case LUA_TNONE:
+                    case LUA_TNIL:
+                        buffer[0] = (float)0;
 
-                    break;
+                        break;
 
-                case LUA_TBOOLEAN:
-                case LUA_TNUMBER:
-                    buffer[0] = (float)1;
-                    buffer[1] = (float)lua_tonumber(state->thread, idx);
+                    case LUA_TBOOLEAN:
+                    case LUA_TNUMBER:
+                        buffer[0] = (float)1;
+                        buffer[1] = (float)lua_tonumber(state->thread, idx);
 
-                    break;
+                        break;
 
-                case LUA_TSTRING:
-                    buffer[0] = (float)2;
+                    case LUA_TSTRING:
+                        buffer[0] = (float)2;
 
-                    char* ret = (char*)lua_tostring(state->thread, idx);
-                    size_t length = sizeof(ret);
+                        char* ret = (char*)lua_tostring(state->thread, idx);
+                        size_t length = sizeof(ret);
 
-                    buffer[1] = (float)length;
+                        buffer[1] = (float)length;
 
-                    for (size_t i = 0; i < length; i++) {
-                        buffer[2 + i] = (float)ret[i];
-                    }
+                        for (size_t i = 0; i < length; i++) {
+                            buffer[2 + i] = (float)ret[i];
+                        }
 
-                    break;
+                        break;
+
+                    default:
+                        buffer[0] = (float)-1;
+
+                        break;
                 }
 
                 return GM_TRUE;

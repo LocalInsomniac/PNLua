@@ -164,14 +164,19 @@ function pnlua_state_call() {
 			___pnlua_buffer_start()
 			
 			switch buffer_read(global.___pnlua_buffer, buffer_f32) {
-				case 0:
-				return undefined
+				case -1: // unsupported
+					show_error("!!! PNLua: Error in state " + string(_id) + " while calling " + (is_undefined(function_name) ? "" : "'" + function_name + "'") + ": Invalid return value", true)
+					
+					break
 				
-				case 1:
-				return buffer_read(global.___pnlua_buffer, buffer_f32)
+				case 0: // none or nil
+					return undefined
 				
-				case 2:
-				return ___pnlua_buffer_read_string()
+				case 1: // number
+					return buffer_read(global.___pnlua_buffer, buffer_f32)
+				
+				case 2: // string
+					return ___pnlua_buffer_read_string()
 			}
 		break
 		
