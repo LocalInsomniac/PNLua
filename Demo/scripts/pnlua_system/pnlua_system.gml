@@ -1,19 +1,9 @@
 global.___pnlua_states = ds_map_create()
 global.___pnlua_buffer = buffer_create(PNLUA_MAX_BUFFER_SIZE, buffer_fixed, 1);
-pnlua_internal_init(buffer_get_address(global.___pnlua_buffer))
+___pnlua_internal_init(buffer_get_address(global.___pnlua_buffer))
 
 function ___pnlua_buffer_start() {
 	buffer_seek(global.___pnlua_buffer, buffer_seek_start, 0)
-}
-
-function ___pnlua_buffer_write_string(str) {
-	var strlen = string_length(str)
-	
-	buffer_write(global.___pnlua_buffer, buffer_f32, strlen)
-	
-	for (var i = 0; i < strlen; i++) {
-		buffer_write(global.___pnlua_buffer, buffer_f32, ord(string_char_at(str, i + 1)))
-	}
 }
 
 function ___pnlua_buffer_read_string() {
@@ -27,9 +17,19 @@ function ___pnlua_buffer_read_string() {
 	return str
 }
 
+function ___pnlua_buffer_write_string(str) {
+	var strlen = string_length(str)
+	
+	buffer_write(global.___pnlua_buffer, buffer_f32, strlen)
+	
+	for (var i = 0; i < strlen; i++) {
+		buffer_write(global.___pnlua_buffer, buffer_f32, ord(string_char_at(str, i + 1)))
+	}
+}
+
 /// @desc Create a Lua state. Return its pointer.
 function pnlua_state_create() {
-	var state = pnlua_internal_state_create()
+	var state = ___pnlua_internal_state_create()
 
 	if state != -1 {
 		ds_map_add_map(global.___pnlua_states, state, ds_map_create())
@@ -41,7 +41,7 @@ function pnlua_state_create() {
 /// @desc Destroy a Lua state.
 /// @param {PNLuaState} id The pointer of the Lua state to destroy.
 function pnlua_state_destroy(id) {
-	if pnlua_internal_state_destroy(id) {
+	if ___pnlua_internal_state_destroy(id) {
 		ds_map_delete(global.___pnlua_states, id)
 	}
 }
@@ -50,7 +50,7 @@ function pnlua_state_destroy(id) {
 /// @param {PNLuaState} id The pointer of the Lua state to load the script into.
 /// @param {string} filename The file name of the Lua script to load.
 function pnlua_state_load(id, file_name) {
-	if pnlua_internal_state_load(id, file_name) == -1 {
+	if ___pnlua_internal_state_load(id, file_name) == -1 {
 		// There was an error loading the script, read the message from the buffer.
 		___pnlua_buffer_start()
 		show_error("!!! PNLua: Error in state " + string(id) + " while loading '" + file_name + "': " + buffer_read(global.___pnlua_buffer, buffer_string), true)
@@ -61,7 +61,7 @@ function pnlua_state_load(id, file_name) {
 /// @param {PNLuaState} id The pointer of the Lua state to register the function in.
 /// @param {string} function_name The name of the function in Lua.
 /// @param {function} callback The function to call.
-/*function pnlua_state_register(id, function_name, callback) {
+function pnlua_state_register(id, function_name, callback) {
 	var state = global.___pnlua_states[? id]
 
 	if is_undefined(state) or ds_map_exists(state, function_name) {
@@ -69,8 +69,8 @@ function pnlua_state_load(id, file_name) {
 	}
 
 	ds_map_add(state, function_name, callback)
-	pnlua_internal_state_register(id, function_name)
-}*/
+	___pnlua_internal_state_register(id, function_name)
+}
 
 /// @desc Execute a script/function loaded within a Lua state.
 /// @param {PNLuaState} id The pointer of the Lua state to execute.
@@ -94,7 +94,7 @@ function pnlua_state_call() {
 			var i = 2
 			
 			repeat argument_count - 2 {
-				array_push(function_args, argument[i])
+				function_args[@ array_length(function_args)] = argument[i]
 				i++
 			}
 		}
@@ -130,9 +130,7 @@ function pnlua_state_call() {
 				var arg = function_args[i]
 				
 				if is_undefined(arg) {
-					repeat 2 {
-						buffer_write(global.___pnlua_buffer, buffer_f32, 0)
-					}
+					buffer_write(global.___pnlua_buffer, buffer_f32, 0)
 				} else {
 					if is_real(arg) {
 						buffer_write(global.___pnlua_buffer, buffer_f32, 1)
@@ -142,7 +140,7 @@ function pnlua_state_call() {
 							buffer_write(global.___pnlua_buffer, buffer_f32, 2)
 							___pnlua_buffer_write_string(arg)
 						} else {
-							show_error("!!! PNLua: Error in state " + string(_id) + " while calling '" + function_name + "': Unsupported data type in argument " + string(i) + " (" + string(arg) + ")", true)
+							show_error("!!! PNLua: Error in state " + string(_id) + " while calling '" + function_name + "': Invalid data type in argument " + string(i) + " (" + string(arg) + ")", true)
 						}
 					}
 				}
@@ -152,7 +150,7 @@ function pnlua_state_call() {
 		}
 	}
 	
-	switch pnlua_internal_state_call(_id) {
+	switch ___pnlua_internal_state_call(_id) {
 		case -1:
 			// There was an error calling the script, read the message from the buffer.
 			___pnlua_buffer_start()
@@ -164,12 +162,7 @@ function pnlua_state_call() {
 			___pnlua_buffer_start()
 			
 			switch buffer_read(global.___pnlua_buffer, buffer_f32) {
-				case -1: // unsupported
-					show_error("!!! PNLua: Error in state " + string(_id) + " while calling " + (is_undefined(function_name) ? "" : "'" + function_name + "'") + ": Invalid return value", true)
-					
-					break
-				
-				case 0: // none or nil
+				case 0: // none, nil or unsupported
 					return undefined
 				
 				case 1: // number
@@ -182,6 +175,55 @@ function pnlua_state_call() {
 		
 		case 2:
 			// The state is waiting for a return value, send it over.
+			show_debug_message("WAITING FOR RESUME")
+			___pnlua_buffer_start()
+			buffer_read(global.___pnlua_buffer, buffer_f32) // PNLuaState
+			
+			var callback_name = ___pnlua_buffer_read_string()
+			var callback_args = undefined
+			var args = buffer_read(global.___pnlua_buffer, buffer_f32)
+			
+			if args {
+				callback_args = []
+				
+				repeat args {
+					var arg_value = undefined
+					
+					switch buffer_read(global.___pnlua_buffer, buffer_f32) {
+						case 1:
+							arg_value = buffer_read(global.___pnlua_buffer, buffer_f32)
+						break
+						
+						case 2:
+							arg_value = ___pnlua_buffer_read_string()
+						break
+					}
+					
+					callback_args[@ array_length(callback_args)] = arg_value
+				}
+			}
+			
+			var callback_return = global.___pnlua_states[? _id][? callback_name](callback_args)
+			
+			___pnlua_buffer_start()
+			
+			if is_undefined(callback_return) {
+				buffer_write(global.___pnlua_buffer, buffer_f32, 0)
+			} else {
+				if is_real(callback_return) {
+					buffer_write(global.___pnlua_buffer, buffer_f32, 1)
+					buffer_write(global.___pnlua_buffer, buffer_f32, callback_return)
+				} else {
+					if is_string(callback_return) {
+						buffer_write(global.___pnlua_buffer, buffer_f32, 2)
+						___pnlua_buffer_write_string(callback_return)
+					} else {
+						show_error("!!! PNLua: Error in state " + string(_id) + " while calling '" + callback_name + "' in '" + function_name + "': Invalid return value (" + string(callback_return) + ")", true)
+					}
+				}
+			}
+			
+			//___pnlua_internal_state_resume(_id)
 		break
 	}
 }

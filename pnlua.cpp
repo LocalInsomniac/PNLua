@@ -49,10 +49,68 @@ PNLuaState* new_pnluastate() {
    LUA FUNCTIONS
    ------------- */
 
-int gm_call(lua_State* lua_state) {
-    // TODO: Buffer writing stuff goes here.
+static int gm_callk(lua_State* L, int status, lua_KContext ctx) {
+    (void)L;
+    (void)status;
+    (void)ctx;
+    
+    return 0;
+}
 
-    return lua_yield(lua_state, 1);
+int gm_call(lua_State* L) {
+    float* buffer = (float*)current_buffer;
+    int i = 0;
+
+    buffer[i++] = (float)(size_t)current_state;
+
+    int args = lua_gettop(L) - 1;
+    char* callback = (char*)lua_tostring(L, args + 1);
+    size_t length = sizeof(callback);
+
+    buffer[i++] = (float)length;
+
+    for (size_t j = 0; j < length; j++) {
+        buffer[i++] = (float)callback[j];
+    }
+
+    buffer[i++] = (float)args;
+
+    for (int j = 0; j < args; j++) {
+        int arg_idx = j + 1;
+
+        switch (lua_type(L, arg_idx)) {
+            case LUA_TBOOLEAN:
+            case LUA_TNUMBER:
+                buffer[i++] = (float)1;
+                buffer[i++] = (float)lua_tonumber(L, arg_idx);
+
+                break;
+
+            case LUA_TSTRING: {
+                buffer[i++] = (float)2;
+
+                char* str = (char*)lua_tostring(L, arg_idx);
+
+                size_t length = sizeof(str);
+                buffer[i++] = (float)length;
+
+                for (size_t k = 0; k < length; k++) {
+                    buffer[i++] = (float)str[k];
+                }
+
+                break;
+            }
+
+            case LUA_TNONE:
+            case LUA_TNIL:
+            default:
+                buffer[i++] = (float)0;
+
+                break;
+        }
+    }
+
+    return lua_yieldk(L, 1, 0, gm_callk);
 }
 
 /* -------------
@@ -129,6 +187,8 @@ extern "C" {
             return GM_FALSE;
         }
 
+        current_state = state;
+
         int args = 0;
         float* buffer = (float*)current_buffer;
         
@@ -178,7 +238,7 @@ extern "C" {
 
                             break;
 
-                        case 2: // string
+                        case 2: { // string
                             size_t length = (size_t)buffer[i++];
                             char* argument = new char[length + 1];
 
@@ -192,22 +252,17 @@ extern "C" {
                             delete[] argument;
 
                             break;
+                        }
                     }
                 }
             }
         }
 
-        switch (lua_pcall(state->thread, args, 1, 0)) {
+        switch (lua_pcallk(state->thread, args, 1, 0, 0, gm_callk)) {
             case LUA_OK: {
                 int idx = lua_gettop(state->thread);
 
                 switch (lua_type(state->thread, idx)) {
-                    case LUA_TNONE:
-                    case LUA_TNIL:
-                        buffer[0] = (float)0;
-
-                        break;
-
                     case LUA_TBOOLEAN:
                     case LUA_TNUMBER:
                         buffer[0] = (float)1;
@@ -215,7 +270,7 @@ extern "C" {
 
                         break;
 
-                    case LUA_TSTRING:
+                    case LUA_TSTRING: {
                         buffer[0] = (float)2;
 
                         char* ret = (char*)lua_tostring(state->thread, idx);
@@ -228,9 +283,12 @@ extern "C" {
                         }
 
                         break;
+                    }
 
-                    default:
-                        buffer[0] = (float)-1;
+                    case LUA_TNONE:
+                    case LUA_TNIL:
+                    default: // unsupported datatype
+                        buffer[0] = (float)0;
 
                         break;
                 }
@@ -248,6 +306,12 @@ extern "C" {
 
                 return -1.0;
         }
+
+        return GM_FALSE;
+    }
+
+    GM_EXPORT double pnlua_internal_state_resume(double id) {
+
 
         return GM_FALSE;
     }

@@ -17,31 +17,31 @@
   "installdir": "",
   "files": [
     {"filename":"PNLua.dll","origname":"","init":"","final":"","kind":1,"uncompress":false,"functions":[
-        {"externalName":"pnlua_internal_init","kind":1,"help":"pnlua_internal_init(buffer)","hidden":false,"returnType":2,"argCount":0,"args":[
+        {"externalName":"pnlua_internal_init","kind":1,"help":"___pnlua_internal_init(buffer)","hidden":false,"returnType":2,"argCount":0,"args":[
             1,
-          ],"resourceVersion":"1.0","name":"pnlua_internal_init","tags":[],"resourceType":"GMExtensionFunction",},
-        {"externalName":"pnlua_internal_state_create","kind":1,"help":"","hidden":false,"returnType":2,"argCount":0,"args":[],"resourceVersion":"1.0","name":"pnlua_internal_state_create","tags":[],"resourceType":"GMExtensionFunction",},
-        {"externalName":"pnlua_internal_state_destroy","kind":1,"help":"pnlua_internal_state_destroy(id)","hidden":false,"returnType":2,"argCount":0,"args":[
+          ],"resourceVersion":"1.0","name":"___pnlua_internal_init","tags":[],"resourceType":"GMExtensionFunction",},
+        {"externalName":"pnlua_internal_state_create","kind":1,"help":"","hidden":false,"returnType":2,"argCount":0,"args":[],"resourceVersion":"1.0","name":"___pnlua_internal_state_create","tags":[],"resourceType":"GMExtensionFunction",},
+        {"externalName":"pnlua_internal_state_destroy","kind":1,"help":"___pnlua_internal_state_destroy(id)","hidden":false,"returnType":2,"argCount":0,"args":[
             2,
-          ],"resourceVersion":"1.0","name":"pnlua_internal_state_destroy","tags":[],"resourceType":"GMExtensionFunction",},
-        {"externalName":"pnlua_internal_state_register","kind":1,"help":"pnlua_internal_state_register(id, function_name)","hidden":false,"returnType":2,"argCount":0,"args":[
-            2,
-            1,
-          ],"resourceVersion":"1.0","name":"pnlua_internal_state_register","tags":[],"resourceType":"GMExtensionFunction",},
-        {"externalName":"pnlua_internal_state_load","kind":1,"help":"pnlua_internal_state_load(id, file_name)","hidden":false,"returnType":2,"argCount":0,"args":[
+          ],"resourceVersion":"1.0","name":"___pnlua_internal_state_destroy","tags":[],"resourceType":"GMExtensionFunction",},
+        {"externalName":"pnlua_internal_state_register","kind":1,"help":"___pnlua_internal_state_register(id, function_name)","hidden":false,"returnType":2,"argCount":0,"args":[
             2,
             1,
-          ],"resourceVersion":"1.0","name":"pnlua_internal_state_load","tags":[],"resourceType":"GMExtensionFunction",},
-        {"externalName":"pnlua_internal_state_call","kind":1,"help":"pnlua_internal_state_call(id)","hidden":false,"returnType":2,"argCount":0,"args":[
+          ],"resourceVersion":"1.0","name":"___pnlua_internal_state_register","tags":[],"resourceType":"GMExtensionFunction",},
+        {"externalName":"pnlua_internal_state_load","kind":1,"help":"___pnlua_internal_state_load(id, file_name)","hidden":false,"returnType":2,"argCount":0,"args":[
             2,
-          ],"resourceVersion":"1.0","name":"pnlua_internal_state_call","tags":[],"resourceType":"GMExtensionFunction",},
+            1,
+          ],"resourceVersion":"1.0","name":"___pnlua_internal_state_load","tags":[],"resourceType":"GMExtensionFunction",},
+        {"externalName":"pnlua_internal_state_call","kind":1,"help":"___pnlua_internal_state_call(id)","hidden":false,"returnType":2,"argCount":0,"args":[
+            2,
+          ],"resourceVersion":"1.0","name":"___pnlua_internal_state_call","tags":[],"resourceType":"GMExtensionFunction",},
       ],"constants":[],"ProxyFiles":[],"copyToTargets":192,"order":[
-        {"name":"pnlua_internal_init","path":"extensions/PNLua/PNLua.yy",},
-        {"name":"pnlua_internal_state_create","path":"extensions/PNLua/PNLua.yy",},
-        {"name":"pnlua_internal_state_destroy","path":"extensions/PNLua/PNLua.yy",},
-        {"name":"pnlua_internal_state_register","path":"extensions/PNLua/PNLua.yy",},
-        {"name":"pnlua_internal_state_load","path":"extensions/PNLua/PNLua.yy",},
-        {"name":"pnlua_internal_state_call","path":"extensions/PNLua/PNLua.yy",},
+        {"name":"___pnlua_internal_init","path":"extensions/PNLua/PNLua.yy",},
+        {"name":"___pnlua_internal_state_create","path":"extensions/PNLua/PNLua.yy",},
+        {"name":"___pnlua_internal_state_destroy","path":"extensions/PNLua/PNLua.yy",},
+        {"name":"___pnlua_internal_state_register","path":"extensions/PNLua/PNLua.yy",},
+        {"name":"___pnlua_internal_state_load","path":"extensions/PNLua/PNLua.yy",},
+        {"name":"___pnlua_internal_state_call","path":"extensions/PNLua/PNLua.yy",},
       ],"resourceVersion":"1.0","name":"","tags":[],"resourceType":"GMExtensionFile",},
   ],
   "classname": "",
